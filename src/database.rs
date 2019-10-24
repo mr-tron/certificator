@@ -9,7 +9,24 @@ const SCHEMA1: &str = "
         raw BLOB,
         der BLOB
      );
-    CREATE UNIQUE INDEX IF NOT EXISTS thumbprint ON certificates(thumbprint);";
+    CREATE UNIQUE INDEX IF NOT EXISTS thumbprint ON certificates(thumbprint);
+
+    CREATE TABLE IF NOT EXISTS keys (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        algo TEXT NOT NULL,
+        option TEXT NOT NULL,
+        public BLOB NOT NULL,
+        private BLOB
+    );
+    CREATE UNIQUE INDEX IF NOT EXISTS keys_public ON keys(public);
+
+    CREATE TABLE IF NOT EXISTS csrs (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        raw BLOB,
+        der BLOB
+    );";
 
 pub struct DB {
     conn: rusqlite::Connection,
@@ -18,7 +35,7 @@ impl DB {
     pub fn new() -> rusqlite::Result<DB> {
         let conn = Connection::open("/tmp/certificator.sqlite")?;
         // todo: versions
-        conn.execute(SCHEMA1, NO_PARAMS)?;
+        conn.execute_batch(SCHEMA1)?;
         return Ok(DB { conn });
     }
 
