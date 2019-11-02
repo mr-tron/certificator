@@ -12,7 +12,10 @@ fn main() {
     let application = Application::new(Some(APPLICATION_ID), Default::default())
         .expect("failed to initialize GTK application");
 
-    application.connect_startup(|app| ui_main::build_ui(app));
+    application.connect_startup(|app| {
+        let _gui = ui_main::CertificatorGUI::new(app);
+        return;
+    });
 
     application.connect_activate(|_| {});
 
