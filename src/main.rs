@@ -13,7 +13,8 @@ fn main() {
         .expect("failed to initialize GTK application");
 
     application.connect_startup(|app| {
-        let _gui = ui_main::CertificatorGUI::new(app);
+        let gui = ui_main::CertificatorGUI::new(app);
+        gui.set_callbacks();
         return;
     });
 

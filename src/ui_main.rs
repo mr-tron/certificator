@@ -1,4 +1,5 @@
 mod ui_certlist;
+mod ui_menu;
 mod ui_viewcert;
 use crate::database;
 
@@ -11,9 +12,9 @@ const APPLICATION_NAME: &str = "Certificator";
 
 pub struct CertificatorGUI {
     pub window: ApplicationWindow,
-    pub menu: Menu,
-    pub lists: Lists,
-    pub view: View,
+    pub menu: ui_menu::Menu,
+    pub lists: ui_certlist::Lists,
+    pub view: ui_viewcert::View,
 }
 
 impl CertificatorGUI {
@@ -27,29 +28,16 @@ impl CertificatorGUI {
         let main_layout = gtk::Box::new(gtk::Orientation::Vertical, MAIN_SPAICING);
         main_layout.set_border_width(5);
 
-        let cert_view = View::new();
-        let menu = Menu::new();
-        let lists = Lists::new();
+        let cert_view = ui_viewcert::View::new();
+        let menu = ui_menu::Menu::new();
+        let lists = ui_certlist::Lists::new();
         main_layout.add(&menu.container);
         main_layout.add(&lists.container);
         main_layout.add(&cert_view.container);
 
         window.add(&main_layout);
-
-        let t = cert_view.view.clone();
-
-        lists.cert_list.connect_cursor_changed(move |treeview| {
-            let selection = treeview.get_selection();
-            if let Some((model, iter)) = selection.get_selected() {
-                let thumbprint = model
-                    .get_value(&iter, 1)
-                    .get::<String>()
-                    .expect("Couldn't get string value");
-                let cert_repr = get_certificate_representation(thumbprint);
-                display_cert(cert_repr, &t)
-            }
-        });
         window.show_all();
+
         CertificatorGUI {
             window,
             lists,
@@ -57,64 +45,25 @@ impl CertificatorGUI {
             menu,
         }
     }
-}
+    pub fn set_callbacks(&self) {
+        let t = self.view.view.clone();
 
-pub struct Menu {
-    container: gtk::Box,
-}
-
-impl Menu {
-    fn new() -> Menu {
-        let lists_layout = gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
-        lists_layout.set_halign(gtk::Align::Fill);
-        let import_button = gtk::Button::new_with_mnemonic("_Import");
-        lists_layout.add(&import_button);
-        import_button.connect_clicked(move |_| show_import_window());
-
-        Menu {
-            container: lists_layout,
-        }
-    }
-}
-pub struct Lists {
-    pub container: gtk::Box,
-    pub cert_list: gtk::TreeView,
-    pub csr_list: gtk::TreeView,
-    pub keys_list: gtk::TreeView,
-}
-
-impl Lists {
-    fn new() -> Lists {
-        let lists_layout = gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
-        lists_layout.set_halign(gtk::Align::Fill);
-        lists_layout.set_valign(gtk::Align::Fill);
-
-        let cert_list = ui_certlist::cert_list();
-        let keys_list = ui_certlist::cert_list();
-        let csr_list = ui_certlist::cert_list();
-        lists_layout.add(&ui_certlist::wrap("CSRs", &csr_list));
-        lists_layout.add(&ui_certlist::wrap("Certificates", &cert_list));
-        lists_layout.add(&ui_certlist::wrap("Keys", &keys_list));
-
-        Lists {
-            container: lists_layout,
-            cert_list: cert_list,
-            csr_list: csr_list,
-            keys_list: keys_list,
-        }
-    }
-}
-pub struct View {
-    container: gtk::Box,
-    view: gtk::TextView,
-}
-
-impl View {
-    fn new() -> View {
-        let container = gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
-        let view = ui_viewcert::view_cert();
-        container.add(&view);
-        View { container, view }
+        self.lists
+            .cert_list
+            .connect_cursor_changed(move |treeview| {
+                let selection = treeview.get_selection();
+                if let Some((model, iter)) = selection.get_selected() {
+                    let thumbprint = model
+                        .get_value(&iter, 1)
+                        .get::<String>()
+                        .expect("Couldn't get string value");
+                    let cert_repr = get_certificate_representation(thumbprint);
+                    display_cert(cert_repr, &t)
+                }
+            });
+        self.menu
+            .import_button
+            .connect_clicked(move |_| show_import_window());
     }
 }
 
