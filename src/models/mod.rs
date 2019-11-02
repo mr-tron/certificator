@@ -1,12 +1,12 @@
-
 pub struct X509CertificateMeta {
     pub name: String,
     pub thumbprint: String,
 }
 
-impl  X509Certificate {
-pub fn repr(&self) -> String {
-    return format!("Version: 3 (0x2)
+impl X509Certificate {
+    pub fn repr(&self) -> String {
+        return format!(
+            "Version: 3 (0x2)
 Serial Number:
     {}
 Signature Algorithm: sha256WithRSAEncryption
@@ -18,16 +18,16 @@ Subject: CN = {}
 Subject Public Key Info:
     Public Key Algorithm: rsaEncryption
         RSA Public-Key: (2048 bit)
-",  self.meta.thumbprint, self.subject.common_name)
+",
+            self.meta.thumbprint, self.subject.common_name
+        );
+    }
 }
-}
-
 
 pub struct X509Subject {
     pub common_name: String,
     pub country: String,
 }
-
 
 pub struct X509Certificate {
     pub meta: X509CertificateMeta,

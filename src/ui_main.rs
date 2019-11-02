@@ -29,7 +29,7 @@ impl CertificatorGUI {
 
         let cert_view = View::new();
         let menu = Menu::new();
-        let lists = Lists::new() ;
+        let lists = Lists::new();
         main_layout.add(&menu.container);
         main_layout.add(&lists.container);
         main_layout.add(&cert_view.container);
@@ -60,20 +60,19 @@ impl CertificatorGUI {
 }
 
 pub struct Menu {
-    container: gtk::Box
+    container: gtk::Box,
 }
-
 
 impl Menu {
     fn new() -> Menu {
-            let lists_layout = gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
-    lists_layout.set_halign(gtk::Align::Fill);
-    let import_button = gtk::Button::new_with_mnemonic("_Import");
-    lists_layout.add(&import_button);
-    import_button.connect_clicked(move |_| show_import_window());
+        let lists_layout = gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
+        lists_layout.set_halign(gtk::Align::Fill);
+        let import_button = gtk::Button::new_with_mnemonic("_Import");
+        lists_layout.add(&import_button);
+        import_button.connect_clicked(move |_| show_import_window());
 
-        Menu{
-            container: lists_layout
+        Menu {
+            container: lists_layout,
         }
     }
 }
@@ -84,9 +83,7 @@ pub struct Lists {
     pub keys_list: gtk::TreeView,
 }
 
-
-
-impl Lists{
+impl Lists {
     fn new() -> Lists {
         let lists_layout = gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
         lists_layout.set_halign(gtk::Align::Fill);
@@ -103,7 +100,7 @@ impl Lists{
             container: lists_layout,
             cert_list: cert_list,
             csr_list: csr_list,
-            keys_list: keys_list
+            keys_list: keys_list,
         }
     }
 }
@@ -112,21 +109,16 @@ pub struct View {
     view: gtk::TextView,
 }
 
-
 impl View {
     fn new() -> View {
-        let container =  gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
+        let container = gtk::Box::new(gtk::Orientation::Horizontal, MAIN_SPAICING);
         let view = ui_viewcert::view_cert();
         container.add(&view);
-        View {
-            container,
-            view
-        }
+        View { container, view }
     }
 }
 
 fn display_cert(cert: String, cert_view: &gtk::TextView) {
-
     cert_view
         .get_buffer()
         .expect("Couldn't get window")
@@ -138,7 +130,6 @@ fn get_certificate_representation(thumbprint: String) -> String {
     let cert = db.get_cert(thumbprint).unwrap();
     return cert.repr();
 }
-
 
 fn show_import_window() {
     println!("ololo")

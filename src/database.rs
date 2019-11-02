@@ -1,5 +1,5 @@
 use crate::models::{X509Certificate, X509CertificateMeta, X509Subject};
-use rusqlite::{Connection, NO_PARAMS};
+use rusqlite::Connection;
 
 const SCHEMA1: &str = "
     CREATE TABLE IF NOT EXISTS certificates (
