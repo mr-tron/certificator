@@ -22,6 +22,7 @@ pub fn view_cert() -> gtk::TextView {
     let view = builder
         .editable(false)
         .vexpand(true)
+        .hexpand(true)
         .cursor_visible(false)
         .monospace(true)
         .build();

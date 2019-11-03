@@ -1,3 +1,4 @@
+mod import_window;
 mod ui_certlist;
 mod ui_menu;
 mod ui_viewcert;
@@ -38,14 +39,16 @@ impl CertificatorGUI {
         window.add(&main_layout);
         window.show_all();
 
-        CertificatorGUI {
+        let gui = CertificatorGUI {
             window,
             lists,
             view: cert_view,
             menu,
-        }
+        };
+        gui.set_callbacks();
+        gui
     }
-    pub fn set_callbacks(&self) {
+    fn set_callbacks(&self) {
         let t = self.view.view.clone();
 
         self.lists
@@ -81,5 +84,5 @@ fn get_certificate_representation(thumbprint: String) -> String {
 }
 
 fn show_import_window() {
-    println!("ololo")
+    let _window = import_window::ImportWindow::new();
 }

@@ -1,4 +1,4 @@
-use crate::models::{X509Certificate, X509CertificateMeta, X509Subject};
+use crate::models::{X509Certificate, X509CertificateDB, X509CertificateMeta, X509Subject};
 use rusqlite::Connection;
 
 const SCHEMA1: &str = "
@@ -79,16 +79,19 @@ impl DB {
         return Ok(vec);
     }
 
-    pub fn save_cert(&self, cert: X509Certificate) -> rusqlite::Result<bool> {
+    pub fn save_cert(&self, cert: X509CertificateDB) -> rusqlite::Result<bool> {
         let result = self.conn.execute_named(
-            "INSERT INTO certificates (name, thumbprint)
-                  VALUES (:name, :thumbprint)",
+            "INSERT INTO certificates (name, thumbprint, raw, der)
+                  VALUES (:name, :thumbprint, :raw, :der);",
             &[
-                (":name", &cert.meta.name.as_str()),
-                (":thumbprint", &cert.meta.thumbprint.as_str()),
+                (":name", &cert.name.as_str()),
+                (":thumbprint", &cert.thumbprint.as_str()),
+                (":raw", &cert.raw),
+                (":der", &cert.der),
             ],
         )?;
         let succes = result == 1;
+        println!("{}", succes);
         return Ok(succes);
     }
 }
