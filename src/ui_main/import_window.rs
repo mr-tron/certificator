@@ -34,6 +34,7 @@ impl ImportWindow {
 
     fn set_callbacks(&self) {
         let t = self.input.clone();
+        let w = self.window.clone();
         self.import_button.connect_clicked(move |_| {
             let buf = t.get_buffer().expect("df");
             let (start, end) = buf.get_bounds();
@@ -41,7 +42,10 @@ impl ImportWindow {
 
             let cert = X509CertificateDB::from_pem(text.as_str());
             let db = database::DB::new().unwrap();
-            db.save_cert(cert);
+            match  db.save_cert(cert) {
+                Ok(_) => w.close(),
+                Err(e) => println!("{}", e),
+            };
         });
     }
 }

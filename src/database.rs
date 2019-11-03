@@ -79,19 +79,22 @@ impl DB {
         return Ok(vec);
     }
 
-    pub fn save_cert(&self, cert: X509CertificateDB) -> rusqlite::Result<bool> {
+    pub fn save_cert(&self, cert: X509CertificateDB) -> rusqlite::Result<String> {
+        let thumbprint = cert.thumbprint;
         let result = self.conn.execute_named(
             "INSERT INTO certificates (name, thumbprint, raw, der)
                   VALUES (:name, :thumbprint, :raw, :der);",
             &[
                 (":name", &cert.name.as_str()),
-                (":thumbprint", &cert.thumbprint.as_str()),
+                (":thumbprint", &thumbprint.as_str()),
                 (":raw", &cert.raw),
                 (":der", &cert.der),
             ],
         )?;
-        let succes = result == 1;
-        println!("{}", succes);
-        return Ok(succes);
+        if result == 1 {
+            return Ok(thumbprint);
+        }
+       return Err(rusqlite::Error::InvalidQuery)
+
     }
 }
