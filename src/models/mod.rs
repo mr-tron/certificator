@@ -1,7 +1,6 @@
 use pem;
 use x509_parser;
 use ring;
-
 pub struct X509CertificateMeta {
     pub name: String,
     pub thumbprint: String,
@@ -26,7 +25,7 @@ impl X509CertificateDB {
             Err(e) => panic!(e),
         };
         let d = ring::digest::digest(&ring::digest::SHA1_FOR_LEGACY_USE_ONLY, b1.as_bytes());
-        let thumbprint = format!("{:x?}", d.as_ref());
+        let thumbprint = thumprint_repr(d.as_ref());
         let name =  format!("{}", cert.tbs_certificate.subject);
         X509CertificateDB {
             raw: Some(b1.into_bytes()),
@@ -36,6 +35,25 @@ impl X509CertificateDB {
             id: 0,
         }
     }
+}
+
+
+// todo: move somewhere else
+// todo: add colons between bytes
+fn thumprint_repr(slice: &[u8]) -> String  {
+    let mut buf = "".to_string();
+    for b in slice {
+        fn hex_from_digit(num: u8) -> char {
+            if num < 10 {
+                (b'0' + num) as char
+            } else {
+                (b'A' + num - 10) as char
+            }
+        }
+        buf.push(hex_from_digit(b / 16));
+        buf.push(hex_from_digit(b % 16));
+    }
+    return buf;
 }
 
 impl X509Certificate {

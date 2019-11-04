@@ -3,7 +3,6 @@ mod ui_certlist;
 mod ui_menu;
 mod ui_viewcert;
 use crate::database;
-
 use gio::prelude::*;
 use gtk::prelude::*;
 use gtk::ApplicationWindow;
@@ -60,6 +59,7 @@ impl CertificatorGUI {
                         .get_value(&iter, 1)
                         .get::<String>()
                         .expect("Couldn't get string value");
+                    println!("{}", thumbprint);
                     let cert_repr = get_certificate_representation(thumbprint);
                     display_cert(cert_repr, &t)
                 }
