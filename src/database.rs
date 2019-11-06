@@ -1,7 +1,8 @@
 use crate::models::{
-    X509Certificate, X509CertificateDB, X509CertificateMeta, X509RequestMeta, X509Subject, KeyMeta
+    X509Certificate, X509CertificateMeta, X509RequestMeta, X509Subject, KeyMeta
 };
 use rusqlite::Connection;
+use crate::utils;
 
 const SCHEMA1: &str = "
     CREATE TABLE IF NOT EXISTS certificates (
@@ -34,6 +35,38 @@ pub struct X509RequestDB {
     pub name: String,
     pub raw: Option<Vec<u8>>,
     pub der: Option<Vec<u8>>,
+}
+
+
+pub struct X509CertificateDB {
+    pub id: u32,
+    pub thumbprint: String,
+    pub name: String,
+    pub raw: Option<Vec<u8>>,
+    pub der: Option<Vec<u8>>,
+}
+
+impl X509CertificateDB {
+    pub fn from_pem(s: &str) -> X509CertificateDB {
+        let b: String = s.into();
+        let b1: String = s.into();
+        let pem = pem::parse(b).unwrap();
+
+        let (_, cert) = match x509_parser::parse_x509_der(pem.contents.as_ref()) {
+            Ok(cert) => cert,
+            Err(e) => panic!(e),
+        };
+        let d = ring::digest::digest(&ring::digest::SHA1_FOR_LEGACY_USE_ONLY, b1.as_bytes());
+        let thumbprint = utils::thumprint_repr(d.as_ref());
+        let name = format!("{}", cert.tbs_certificate.subject);
+        X509CertificateDB {
+            raw: Some(b1.into_bytes()),
+            thumbprint,
+            name,
+            der: Some(pem.contents),
+            id: 0,
+        }
+    }
 }
 
 pub struct DB {

@@ -1,6 +1,7 @@
 extern crate gio;
 extern crate gtk;
 mod database;
+mod utils;
 mod models;
 mod ui_main;
 use gio::prelude::*;

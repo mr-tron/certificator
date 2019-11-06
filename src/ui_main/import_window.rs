@@ -1,5 +1,4 @@
 use crate::database;
-use crate::models::X509CertificateDB;
 use gtk::prelude::*;
 
 const MAIN_SPAICING: i32 = 5;
@@ -40,7 +39,7 @@ impl ImportWindow {
             let (start, end) = buf.get_bounds();
             let text = buf.get_text(&start, &end, false).expect("dfs");
 
-            let cert = X509CertificateDB::from_pem(text.as_str());
+            let cert = database::X509CertificateDB::from_pem(text.as_str());
             let db = database::DB::new().unwrap();
             match db.save_cert(cert) {
                 Ok(_) => w.close(),
