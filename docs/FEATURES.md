@@ -2,14 +2,15 @@
 
 - [ ] Scan trusted stores and import all CA certificate (on startup)
 - [ ] Scan all FS and find all certificates, private keys and CSRs (manual)
-- [ ] Window for copypaste with autodetection copypaste content
+- [x] Window for copypaste 
+  - [ ] with autodetection copypaste content
 - [ ] File selector
 - [ ] Parent CA via CA Issuers field in cert (optional)
 - [ ] OCSP
 
 ### Support formats
 
-- [ ] pem
+- [x] pem
 - [ ] der
 - [ ] pkcs12
 
