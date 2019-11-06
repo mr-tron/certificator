@@ -1,4 +1,6 @@
-use crate::models::{X509Certificate, X509CertificateDB, X509CertificateMeta, X509Subject};
+use crate::models::{
+    X509Certificate, X509CertificateDB, X509CertificateMeta, X509RequestMeta, X509Subject, KeyMeta
+};
 use rusqlite::Connection;
 
 const SCHEMA1: &str = "
@@ -27,6 +29,12 @@ const SCHEMA1: &str = "
         raw BLOB,
         der BLOB
     );";
+
+pub struct X509RequestDB {
+    pub name: String,
+    pub raw: Option<Vec<u8>>,
+    pub der: Option<Vec<u8>>,
+}
 
 pub struct DB {
     conn: rusqlite::Connection,
@@ -94,7 +102,47 @@ impl DB {
         if result == 1 {
             return Ok(thumbprint);
         }
-       return Err(rusqlite::Error::InvalidQuery)
+        return Err(rusqlite::Error::InvalidQuery);
+    }
 
+    pub fn get_csrs(&self, offset: u32, limit: u32) -> rusqlite::Result<Vec<X509RequestMeta>> {
+        let mut stmt = self
+            .conn
+            .prepare("SELECT id, name FROM csrs ORDER BY id LIMIT ?1 OFFSET ?2;")?;
+        let cert_list = stmt
+            .query_map(&[&limit, &offset], |row| {
+                Ok(X509RequestMeta {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                })
+            })
+            .unwrap();
+        let mut vec = Vec::new();
+        for c in cert_list {
+            let cert = c?;
+            vec.push(cert)
+        }
+        return Ok(vec);
+    }
+    pub fn get_keys(&self, offset: u32, limit: u32) -> rusqlite::Result<Vec<KeyMeta>> {
+        let mut stmt = self
+            .conn
+            .prepare("SELECT id, name, algo, option FROM keys ORDER BY id LIMIT ?1 OFFSET ?2;")?;
+        let cert_list = stmt
+            .query_map(&[&limit, &offset], |row| {
+                Ok(KeyMeta {
+                    id: row.get(0)?,
+                    name: row.get(1)?,
+                    algo: row.get(2)?,
+                    option: row.get(3)?
+                })
+            })
+            .unwrap();
+        let mut vec = Vec::new();
+        for c in cert_list {
+            let cert = c?;
+            vec.push(cert)
+        }
+        return Ok(vec);
     }
 }

@@ -1,6 +1,6 @@
 use pem;
-use x509_parser;
 use ring;
+use x509_parser;
 pub struct X509CertificateMeta {
     pub name: String,
     pub thumbprint: String,
@@ -16,8 +16,8 @@ pub struct X509CertificateDB {
 
 impl X509CertificateDB {
     pub fn from_pem(s: &str) -> X509CertificateDB {
-        let b :String =  s.into();
-        let b1 :String =  s.into();
+        let b: String = s.into();
+        let b1: String = s.into();
         let pem = pem::parse(b).unwrap();
 
         let (_, cert) = match x509_parser::parse_x509_der(pem.contents.as_ref()) {
@@ -26,7 +26,7 @@ impl X509CertificateDB {
         };
         let d = ring::digest::digest(&ring::digest::SHA1_FOR_LEGACY_USE_ONLY, b1.as_bytes());
         let thumbprint = thumprint_repr(d.as_ref());
-        let name =  format!("{}", cert.tbs_certificate.subject);
+        let name = format!("{}", cert.tbs_certificate.subject);
         X509CertificateDB {
             raw: Some(b1.into_bytes()),
             thumbprint,
@@ -37,10 +37,9 @@ impl X509CertificateDB {
     }
 }
 
-
 // todo: move somewhere else
 // todo: add colons between bytes
-fn thumprint_repr(slice: &[u8]) -> String  {
+fn thumprint_repr(slice: &[u8]) -> String {
     let mut buf = "".to_string();
     for b in slice {
         fn hex_from_digit(num: u8) -> char {
@@ -86,4 +85,26 @@ pub struct X509Certificate {
     pub meta: X509CertificateMeta,
     pub raw: Option<Vec<u8>>,
     pub subject: X509Subject,
+}
+
+pub struct X509RequestMeta {
+    pub id: u32,
+    pub name: String,
+}
+
+pub struct X509Request {
+    pub meta: X509RequestMeta,
+    pub subject: X509Subject,
+}
+
+pub struct KeyMeta {
+    pub id: u32,
+    pub name: String,
+    pub algo: String,
+    pub option: String,
+}
+pub struct Key {
+    pub meta: KeyMeta,
+    pub public: Vec<u8>,
+    pub private: Option<Vec<u8>>,
 }
