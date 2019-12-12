@@ -1,3 +1,4 @@
+// Copyright Denis Subbotin 2019
 extern crate gio;
 extern crate gtk;
 mod database;
